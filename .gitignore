@@ -1,0 +1,14 @@
+node_modules
+/build
+/.svelte-kit
+/package
+/data
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+.env
+.env.*
+!.env.example
+.DS_Store
+vite.config.ts.timestamp-*

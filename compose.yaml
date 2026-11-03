@@ -1,0 +1,10 @@
+services:
+  clinicq:
+    build: .
+    ports:
+      - "5114:5114"
+    environment:
+      PORT: "5114"
+      ORIGIN: "http://localhost:5114"
+      CLINICQ_RESEED: "1"
+    restart: unless-stopped
