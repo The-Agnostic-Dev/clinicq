@@ -5,6 +5,7 @@
   "type": "module",
   "description": "Front desk system for a small private clinic: walk-in queue, appointments, doctor availability and daily summary.",
   "scripts": {
+    "prepare": "svelte-kit sync",
     "dev": "vite dev --port 5114",
     "build": "vite build",
     "preview": "vite preview --port 5114",
