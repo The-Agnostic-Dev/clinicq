@@ -1,5 +1,5 @@
 import type { Ticket, TicketStatus } from '$lib/types';
-import { clinicToday } from '$lib/time';
+import { clinicToday, addDays } from '$lib/time';
 import { estimateWaitMinutes } from '$lib/waits';
 import { getDb, stamp } from './db';
 import { onDutyDoctors } from './roster';
@@ -73,9 +73,10 @@ export function issueTicket(input: NewTicket, now = new Date()): Ticket {
 	const day = clinicToday(now);
 
 	const issue = db.transaction(() => {
+		const yesterday = addDays(day, -1);
 		const { last } = db
-			.prepare('SELECT COALESCE(MAX(number), 0) AS last FROM tickets WHERE day = ?')
-			.get(day) as { last: number };
+			.prepare('SELECT COALESCE(MAX(number), 0) AS last FROM tickets WHERE day IN (?, ?)')
+			.get(day, yesterday) as { last: number };
 		const { ahead } = db
 			.prepare(`SELECT COUNT(*) AS ahead FROM tickets WHERE day = ? AND status = 'waiting'`)
 			.get(day) as { ahead: number };

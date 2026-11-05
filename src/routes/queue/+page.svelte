@@ -2,6 +2,7 @@
 	import { enhance } from '$app/forms';
 	import { invalidateAll } from '$app/navigation';
 	import Flash from '$lib/components/Flash.svelte';
+	import StatusBadge from '$lib/components/StatusBadge.svelte';
 	import { formatWait } from '$lib/format';
 	import { formatPhone } from '$lib/phone';
 	import { waitingSince, waitingTickets } from '$lib/tickets';
@@ -31,7 +32,7 @@
 <svelte:head><title>Walk-in queue · ClinicQ</title></svelte:head>
 
 <h1>Walk-in queue</h1>
-<p class="subtitle">{formatDay(data.today)}. Ticket numbers start again from A1 every morning.</p>
+<p class="subtitle">{formatDay(data.today)}. Ticket numbers continue from the previous day.</p>
 
 {#if form?.issued}
 	<Flash kind="ok">
@@ -127,6 +128,27 @@
 						</tr>
 					{:else}
 						<tr><td colspan="6" class="empty">Nobody is waiting.</td></tr>
+					{/each}
+				</tbody>
+			</table>
+		</section>
+
+		<section class="card">
+			<h2>Yesterday</h2>
+			<table>
+				<thead>
+					<tr><th>Ticket</th><th>Patient</th><th>Reason</th><th>Status</th></tr>
+				</thead>
+				<tbody>
+					{#each data.yesterdayTickets as ticket (ticket.id)}
+						<tr data-ticket-id={ticket.id}>
+							<td class="ticket-code">{ticket.code}</td>
+							<td>{ticket.patientName}<br /><span class="muted">{formatPhone(ticket.phone)}</span></td>
+							<td>{ticket.reason}</td>
+							<td><StatusBadge status={ticket.status} /></td>
+						</tr>
+					{:else}
+						<tr><td colspan="4" class="empty">No tickets from yesterday.</td></tr>
 					{/each}
 				</tbody>
 			</table>

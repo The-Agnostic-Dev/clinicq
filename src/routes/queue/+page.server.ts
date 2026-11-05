@@ -2,14 +2,16 @@ import { fail } from '@sveltejs/kit';
 import { int, readPatient } from '$lib/server/forms';
 import { callNext, finishTicket, issueTicket, listTickets, markNoShow } from '$lib/server/queue';
 import { onDutyDoctors } from '$lib/server/roster';
-import { clinicToday } from '$lib/time';
-import type { Actions, PageServerLoad } from './$types';
+import { clinicToday, addDays } from '$lib/time';
+import type { Actions, PageServerLoad } from '@sveltejs/kit';
 
 export const load: PageServerLoad = () => {
 	const today = clinicToday();
+	const yesterday = addDays(today, -1);
 	return {
 		today,
 		tickets: listTickets(today),
+		yesterdayTickets: listTickets(yesterday),
 		doctors: onDutyDoctors()
 	};
 };
