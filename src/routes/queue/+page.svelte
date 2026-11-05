@@ -6,17 +6,18 @@
 	import { formatWait } from '$lib/format';
 	import { formatPhone } from '$lib/phone';
 	import { waitingSince, waitingTickets } from '$lib/tickets';
+import type { Ticket } from '$lib/types';
 	import { formatDay } from '$lib/time';
 
 	let { data, form } = $props();
 
 	const waiting = $derived(waitingTickets(data.tickets));
 	const waitingCount = $derived(waiting.length);
-	const seenCount = $derived(data.tickets.filter((t) => t.status === 'done').length);
-	const noShowCount = $derived(data.tickets.filter((t) => t.status === 'no_show').length);
-	const servingBy = $derived(
-		new Map(data.tickets.filter((t) => t.status === 'serving').map((t) => [t.doctorId, t]))
-	);
+	const seenCount = $derived(data.tickets.filter((t: Ticket) => t.status === 'done').length);
+	const noShowCount = $derived(data.tickets.filter((t: Ticket) => t.status === 'no_show').length);
+const servingBy = $derived(
+    new Map(data.tickets.filter((t: Ticket) => t.status === 'serving').map((t: Ticket) => [t.doctorId, t]))
+);
 
 	let now = $state(Date.now());
 
