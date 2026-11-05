@@ -4,13 +4,13 @@
 	import Flash from '$lib/components/Flash.svelte';
 	import { formatWait } from '$lib/format';
 	import { formatPhone } from '$lib/phone';
-	import { byCode, waitingSince } from '$lib/tickets';
+	import { waitingSince, waitingTickets } from '$lib/tickets';
 	import { formatDay } from '$lib/time';
 
 	let { data, form } = $props();
 
-	const waiting = $derived(data.tickets.filter((t) => t.status === 'waiting').toSorted(byCode));
-	const waitingCount = $derived(data.tickets.filter((t) => t.status !== 'done').length);
+	const waiting = $derived(waitingTickets(data.tickets));
+	const waitingCount = $derived(waiting.length);
 	const seenCount = $derived(data.tickets.filter((t) => t.status === 'done').length);
 	const noShowCount = $derived(data.tickets.filter((t) => t.status === 'no_show').length);
 	const servingBy = $derived(
