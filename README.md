@@ -22,8 +22,9 @@ for the visit as the patient gave it at the desk.
 
 - The clinic runs on Lagos time (WAT, UTC+1) whatever timezone the server is in. Times are
   stored as UTC instants and always shown on the Lagos clock.
-- **Ticket numbers start again from A1 every morning.** The queue page only shows today's
-  tickets; earlier days are in the daily summary (pick the date) and in patient search.
+- **Ticket numbers continue from the last ticket issued**, so they never restart at A1. The
+  queue page shows today's tickets plus yesterday's in their own section; earlier days are in
+  the daily summary (pick the date) and in patient search.
 - Walk-ins are not tied to a doctor. "Call next" always calls the waiting patient with the lowest
   ticket number to the doctor whose button was pressed. A doctor must press "Done" or "Not here"
   for their current patient before calling the next one.
