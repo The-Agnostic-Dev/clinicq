@@ -6,7 +6,7 @@
 	import { formatWait } from '$lib/format';
 	import { formatPhone } from '$lib/phone';
 	import { waitingSince, waitingTickets } from '$lib/tickets';
-import type { Ticket } from '$lib/types';
+	import type { Ticket } from '$lib/types';
 	import { formatDay } from '$lib/time';
 
 	let { data, form } = $props();
@@ -18,8 +18,8 @@ import type { Ticket } from '$lib/types';
 const servingBy = $derived(
 	new Map<number, Ticket>(
 		data.tickets
-			.filter((t: Ticket) => t.status === 'serving')
-			.map((t: Ticket): [number, Ticket] => [t.doctorId, t])
+			.filter((t): t is Ticket & { doctorId: number } => t.status === 'serving' && t.doctorId !== null)
+			.map((t): [number, Ticket] => [t.doctorId, t])
 	)
 );
 
