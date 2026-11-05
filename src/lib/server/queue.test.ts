@@ -18,6 +18,19 @@ describe('walk-in queue', () => {
 		expect(first.status).toBe('waiting');
 	});
 
+	it('continues numbering from the highest number already issued, not per day', () => {
+		const yesterday = clinicToday(new Date(Date.now() - 24 * 60 * 60 * 1000));
+		getDb()
+			.prepare(
+				`INSERT INTO tickets (day, number, patient_name, phone, reason, status, issued_at)
+				 VALUES (?, ?, ?, ?, ?, 'done', ?)`
+			)
+			.run(yesterday, 500, 'Yesterday Patient', '08030000009', 'Old visit', new Date().toISOString());
+		const ticket = issueTicket({ patientName: 'Ada Obi', phone: '08030000001', reason: 'Cough' });
+		expect(ticket.number).toBe(501);
+		expect(ticket.code).toBe('A501');
+	});
+
 	it('gives a new ticket an estimate based on the people already waiting', () => {
 		const waiting = listTickets().filter((t) => t.status === 'waiting').length;
 		const ticket = issueTicket({ patientName: 'Chidi Eke', phone: '08030000003', reason: '' });
