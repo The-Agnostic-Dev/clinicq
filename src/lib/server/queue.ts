@@ -74,8 +74,8 @@ export function issueTicket(input: NewTicket, now = new Date()): Ticket {
 
 	const issue = db.transaction(() => {
 		const { last } = db
-			.prepare('SELECT COALESCE(MAX(number), 0) AS last FROM tickets WHERE day = ?')
-			.get(day) as { last: number };
+			.prepare('SELECT COALESCE(MAX(number), 0) AS last FROM tickets')
+			.get() as { last: number };
 		const { ahead } = db
 			.prepare(`SELECT COUNT(*) AS ahead FROM tickets WHERE day = ? AND status = 'waiting'`)
 			.get(day) as { ahead: number };
