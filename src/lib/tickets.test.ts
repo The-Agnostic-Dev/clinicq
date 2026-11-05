@@ -4,6 +4,7 @@ import { getDb } from '$lib/server/db';
 import { listTickets, markNoShow } from '$lib/server/queue';
 import { waitingTickets } from '$lib/tickets';
 import { clinicToday } from '$lib/time';
+import type { Ticket } from '$lib/types';
 
 describe('waitingTickets', () => {
 	beforeEach(() => {
@@ -14,7 +15,7 @@ describe('waitingTickets', () => {
 		const tickets = listTickets(clinicToday());
 		const waiting = waitingTickets(tickets);
 		expect(waiting).toHaveLength(3);
-		expect(waiting.map((t) => t.number)).toEqual([7, 8, 9]);
+		expect(waiting.map((t: Ticket) => t.number)).toEqual([7, 8, 9]);
 	});
 
 	it('returns an empty list after all waiting tickets are marked as no-shows', () => {
