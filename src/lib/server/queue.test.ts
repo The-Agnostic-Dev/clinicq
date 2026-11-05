@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { clinicToday } from '$lib/time';
+import { addDays, clinicToday } from '$lib/time';
 import { getDb } from './db';
 import { callNext, finishTicket, issueTicket, listTickets, markNoShow } from './queue';
 import { seedDemoData } from './seed';
@@ -48,5 +48,21 @@ describe('walk-in queue', () => {
 		const waiting = listTickets().find((t) => t.status === 'waiting')!;
 		const result = markNoShow(waiting.id);
 		expect(result.ok && result.ticket.status).toBe('no_show');
+	});
+
+	it('keeps yesterday’s tickets and continues numbering after them', () => {
+		const yesterday = addDays(clinicToday(), -1);
+		const db = getDb();
+		const insert = db.prepare(
+			`INSERT INTO tickets (day, number, patient_name, phone, reason, status, issued_at, est_wait_minutes)
+			 VALUES (?, ?, ?, ?, ?, 'waiting', ?, 0)`
+		);
+		for (let i = 1; i <= 4; i++) {
+			insert.run(yesterday, i, `Yesterday Patient ${i}`, `0800000000${i}`, '', new Date().toISOString());
+		}
+
+		const ticket = issueTicket({ patientName: 'Today New', phone: '08030000009', reason: '' });
+		expect(ticket.number).toBe(10);
+		expect(listTickets(yesterday)).toHaveLength(4);
 	});
 });
