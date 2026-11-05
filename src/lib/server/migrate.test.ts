@@ -70,4 +70,62 @@ describe('fixAppointmentTimes', () => {
     expect(after.starts_at).toBe(before.starts_at);
     expect(after.ends_at).toBe(before.ends_at);
   });
+
+  it('keeps already-correct rows unchanged when offset is negative (UTC+1)', () => {
+    const db = getDb();
+    seedDemoData(db);
+
+    const uniqueCreatedAt = new Date('2020-01-02T00:00:00.000Z').toISOString();
+    db.prepare(
+      `INSERT INTO appointments (doctor_id, patient_name, phone, reason, starts_at, ends_at, status, checked_in_at, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+    ).run(
+      1,
+      'Negative Offset Patient',
+      '08000000001',
+      'Test reason',
+      '2026-05-01T09:00:00.000Z',
+      '2026-05-01T09:20:00.000Z',
+      'booked',
+      null,
+      uniqueCreatedAt
+    );
+
+    fixAppointmentTimes(db, -60);
+
+    const row = db
+      .prepare('SELECT starts_at, ends_at FROM appointments WHERE patient_name = ?')
+      .get('Negative Offset Patient') as { starts_at: string; ends_at: string };
+    expect(row.starts_at).toBe('2026-05-01T09:00:00.000Z');
+    expect(row.ends_at).toBe('2026-05-01T09:20:00.000Z');
+  });
+
+  it('reconstructs local day correctly when time crosses midnight with negative offset', () => {
+    const db = getDb();
+    seedDemoData(db);
+
+    const uniqueCreatedAt = new Date('2020-01-03T00:00:00.000Z').toISOString();
+    db.prepare(
+      `INSERT INTO appointments (doctor_id, patient_name, phone, reason, starts_at, ends_at, status, checked_in_at, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+    ).run(
+      1,
+      'Midnight Patient',
+      '08000000002',
+      'Test reason',
+      '2026-05-01T23:15:00.000Z',
+      '2026-05-01T23:35:00.000Z',
+      'booked',
+      null,
+      uniqueCreatedAt
+    );
+
+    fixAppointmentTimes(db, -60);
+
+    const row = db
+      .prepare('SELECT starts_at, ends_at FROM appointments WHERE patient_name = ?')
+      .get('Midnight Patient') as { starts_at: string; ends_at: string };
+    expect(row.starts_at).toBe('2026-05-01T23:15:00.000Z');
+    expect(row.ends_at).toBe('2026-05-01T23:35:00.000Z');
+  });
 });
