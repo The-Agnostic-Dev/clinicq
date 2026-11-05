@@ -1,7 +1,8 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { seedDemoData } from '$lib/server/seed';
 import { getDb } from '$lib/server/db';
-import { listTickets, waitingTickets, markNoShow } from '$lib/tickets';
+import { listTickets, markNoShow } from '$lib/server/queue';
+import { waitingTickets } from '$lib/tickets';
 import { clinicToday } from '$lib/time';
 
 describe('waitingTickets', () => {
@@ -20,7 +21,7 @@ describe('waitingTickets', () => {
 		const tickets = listTickets(clinicToday());
 		const waiting = waitingTickets(tickets);
 		for (const ticket of waiting) {
-			markNoShow(ticket);
+			markNoShow(ticket.id);
 		}
 		const updatedTickets = listTickets(clinicToday());
 		const updatedWaiting = waitingTickets(updatedTickets);
