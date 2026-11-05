@@ -57,12 +57,14 @@ describe('walk-in queue', () => {
 			`INSERT INTO tickets (day, number, patient_name, phone, reason, status, issued_at, est_wait_minutes)
 			 VALUES (?, ?, ?, ?, ?, 'waiting', ?, 0)`
 		);
-		for (let i = 1; i <= 4; i++) {
+		for (let i = 10; i <= 13; i++) {
 			insert.run(yesterday, i, `Yesterday Patient ${i}`, `0800000000${i}`, '', new Date().toISOString());
 		}
 
 		const ticket = issueTicket({ patientName: 'Today New', phone: '08030000009', reason: '' });
-		expect(ticket.number).toBe(10);
+		expect(ticket.number).toBe(14);
+		expect(ticket.code).toBe('A14');
+		expect(listTickets()).toHaveLength(13);
 		expect(listTickets(yesterday)).toHaveLength(4);
 	});
 });
