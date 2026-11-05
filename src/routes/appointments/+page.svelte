@@ -14,7 +14,7 @@
 			.map((doctor) => ({ doctor, appointments: data.appointments.filter((a) => a.doctorId === doctor.id) }))
 	);
 
-	let pending = $state<number | null>();
+	let pending = $state<number | null>(null);
 </script>
 
 <svelte:head><title>Appointments · ClinicQ</title></svelte:head>
