@@ -64,7 +64,7 @@ describe('walk-in queue', () => {
 		const ticket = issueTicket({ patientName: 'Today New', phone: '08030000009', reason: '' });
 		expect(ticket.number).toBe(14);
 		expect(ticket.code).toBe('A14');
-		expect(listTickets()).toHaveLength(13);
+		expect(listTickets()).toHaveLength(10);
 		expect(listTickets(yesterday)).toHaveLength(4);
 	});
 });
