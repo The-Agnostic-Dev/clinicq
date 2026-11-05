@@ -2,6 +2,7 @@ import Database from 'better-sqlite3';
 import { mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { seedDemoData } from './seed';
+import { fixAppointmentTimes } from './migrate';
 
 const SCHEMA = `
 CREATE TABLE IF NOT EXISTS doctors (
@@ -75,6 +76,12 @@ export function getDb(): Database.Database {
 	conn.pragma('journal_mode = WAL');
 	conn.pragma('foreign_keys = ON');
 	conn.exec(SCHEMA);
+
+	const { user_version } = conn.prepare('PRAGMA user_version').get() as { user_version: number };
+	if (user_version === 0) {
+		fixAppointmentTimes(conn);
+		conn.pragma('user_version = 1');
+	}
 
 	const { count } = conn.prepare('SELECT COUNT(*) AS count FROM doctors').get() as { count: number };
 	if (count === 0 || process.env.CLINICQ_RESEED === '1') {
