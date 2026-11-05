@@ -1,5 +1,5 @@
 import { isValidPhone, normalisePhone } from '$lib/phone';
-import { isValidDay, isValidTime } from '$lib/time';
+import { clinicInstant, isValidDay, isValidTime } from '$lib/time';
 
 export function text(form: FormData, name: string): string {
 	const value = form.get(name);
@@ -34,5 +34,5 @@ export function readSlot(form: FormData): Parsed<{ day: string; time: string; st
 	const day = text(form, 'date');
 	const time = text(form, 'time');
 	if (!isValidDay(day) || !isValidTime(time)) return { ok: false, error: 'Choose a date and a time.' };
-	return { ok: true, value: { day, time, startsAt: new Date(`${day}T${time}:00`) } };
+	return { ok: true, value: { day, time, startsAt: clinicInstant(day, time) } };
 }
