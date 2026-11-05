@@ -3,9 +3,9 @@ import { int, readPatient } from '$lib/server/forms';
 import { callNext, finishTicket, issueTicket, listTickets, markNoShow } from '$lib/server/queue';
 import { onDutyDoctors } from '$lib/server/roster';
 import { clinicToday, addDays } from '$lib/time';
-import type { Actions, PageServerLoad } from '@sveltejs/kit';
+import type { Actions, ServerLoad } from '@sveltejs/kit';
 
-export const load: PageServerLoad = () => {
+export const load: ServerLoad = () => {
 	const today = clinicToday();
 	const yesterday = addDays(today, -1);
 	return {
