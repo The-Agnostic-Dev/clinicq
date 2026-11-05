@@ -16,7 +16,11 @@ import type { Ticket } from '$lib/types';
 	const seenCount = $derived(data.tickets.filter((t: Ticket) => t.status === 'done').length);
 	const noShowCount = $derived(data.tickets.filter((t: Ticket) => t.status === 'no_show').length);
 const servingBy = $derived(
-    new Map(data.tickets.filter((t: Ticket) => t.status === 'serving').map((t: Ticket) => [t.doctorId, t]))
+	new Map<number, Ticket>(
+		data.tickets
+			.filter((t: Ticket) => t.status === 'serving')
+			.map((t: Ticket): [number, Ticket] => [t.doctorId, t])
+	)
 );
 
 	let now = $state(Date.now());
