@@ -4,16 +4,15 @@ import { getDoctor, isOffToday, listDoctors, setOffToday, updateSchedule } from 
 import { int, text } from '$lib/server/forms';
 import { invalidateRoster } from '$lib/server/roster';
 import { isValidTime, minutesOfDay } from '$lib/time';
-import type { Actions, PageServerLoad } from './$types';
 
-export const load: PageServerLoad = ({ locals }) => {
+export const load = ({ locals }) => {
 	return {
 		canEdit: canManageDoctors(locals.user),
 		doctors: listDoctors().map((d) => ({ ...d, onDuty: !isOffToday(d) }))
 	};
 };
 
-function requireManager(locals: App.Locals) {
+function requireManager(locals) {
 	if (!canManageDoctors(locals.user)) error(403, 'Only the clinic manager can change doctor schedules.');
 }
 
@@ -23,7 +22,7 @@ function parseFee(raw: string): number | null {
 	return Number.isFinite(value) && value > 0 ? Math.round(value * 100) : null;
 }
 
-export const actions: Actions = {
+export const actions = {
 	toggleDuty: async ({ request, locals }) => {
 		requireManager(locals);
 		const form = await request.formData();
@@ -31,6 +30,7 @@ export const actions: Actions = {
 		if (!doctor) return fail(404, { error: 'Doctor not found.' });
 		const off = text(form, 'off') === '1';
 		setOffToday(doctor.id, off);
+		invalidateRoster();
 		return { message: off ? `${doctor.name} is marked as not in today.` : `${doctor.name} is back on duty today.` };
 	},
 

@@ -2,6 +2,7 @@ import type { Ticket, TicketStatus } from '$lib/types';
 import { clinicToday } from '$lib/time';
 import { estimateWaitMinutes } from '$lib/waits';
 import { getDb, stamp } from './db';
+import { getDoctor } from './doctors';
 import { onDutyDoctors } from './roster';
 
 export const TICKET_PREFIX = 'A';
@@ -97,6 +98,12 @@ export type QueueResult = { ok: true; ticket: Ticket } | { ok: false; error: str
 
 /** Call the longest-waiting patient to a doctor's room. */
 export function callNext(doctorId: number, day = clinicToday()): QueueResult {
+	const doctor = getDoctor(doctorId);
+	if (!doctor) return { ok: false, error: 'Doctor not found.' };
+	if (!onDutyDoctors().some((d) => d.id === doctorId)) {
+		return { ok: false, error: `${doctor.name} is not in today.` };
+	}
+
 	const db = getDb();
 	const busy = db
 		.prepare(`SELECT number FROM tickets WHERE day = ? AND doctor_id = ? AND status = 'serving'`)
