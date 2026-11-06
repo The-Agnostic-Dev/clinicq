@@ -12,8 +12,8 @@ export const load = ({ locals }) => {
 	};
 };
 
-function requireManager(locals: App.Locals) {
-	if (!canManageDoctors(locals.user)) error(403, 'Only the clinic manager can change doctor schedules.');
+function requireManager(user: Parameters<typeof canManageDoctors>[0]) {
+	if (!canManageDoctors(user)) error(403, 'Only the clinic manager can change doctor schedules.');
 }
 
 /** "15,000" or "15000.50" naira -> kobo */
@@ -24,7 +24,7 @@ function parseFee(raw: string): number | null {
 
 export const actions = {
 	toggleDuty: async ({ request, locals }) => {
-		requireManager(locals);
+		requireManager(locals.user);
 		const form = await request.formData();
 		const doctor = getDoctor(int(form, 'id'));
 		if (!doctor) return fail(404, { error: 'Doctor not found.' });
@@ -35,7 +35,7 @@ export const actions = {
 	},
 
 	saveSchedule: async ({ request, locals }) => {
-		requireManager(locals);
+		requireManager(locals.user);
 		const form = await request.formData();
 		const doctor = getDoctor(int(form, 'id'));
 		if (!doctor) return fail(404, { error: 'Doctor not found.' });
