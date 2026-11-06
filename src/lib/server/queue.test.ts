@@ -1,7 +1,9 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { clinicToday } from '$lib/time';
 import { getDb } from './db';
+import { setOffToday } from './doctors';
 import { callNext, finishTicket, issueTicket, listTickets, markNoShow } from './queue';
+import { invalidateRoster, onDutyDoctors } from './roster';
 import { seedDemoData } from './seed';
 
 describe('walk-in queue', () => {
@@ -45,6 +47,20 @@ describe('walk-in queue', () => {
 			expect(result.ticket.code).toBe('A7');
 			expect(result.ticket.status).toBe('serving');
 			expect(result.ticket.doctorName).toBe('Dr Tunde Bakare');
+		}
+	});
+
+	it('will not call a patient to a doctor who is off today', () => {
+		setOffToday(2, true);
+		invalidateRoster();
+		try {
+			expect(onDutyDoctors().map((d) => d.id)).not.toContain(2);
+			const result = callNext(2);
+			expect(result.ok).toBe(false);
+			if (!result.ok) expect(result.error).toContain('Dr Tunde Bakare');
+		} finally {
+			setOffToday(2, false);
+			invalidateRoster();
 		}
 	});
 
