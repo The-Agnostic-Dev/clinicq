@@ -12,7 +12,7 @@ export const load = ({ locals }) => {
 	};
 };
 
-function requireManager(locals) {
+function requireManager(locals: App.Locals) {
 	if (!canManageDoctors(locals.user)) error(403, 'Only the clinic manager can change doctor schedules.');
 }
 
